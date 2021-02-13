@@ -21,25 +21,35 @@ let globalEnvironment = {
     "+": (a,b) => Number(a) + Number(b)
 }
 
-let programString = `+ 28 2`
+let programString = `
++ 28 2
++ 40 11
+`
 
+//Каждая новая строка - новое выражение, делим по выражениям по \n
+const splitLinesToExpressions = (str) => str.split(/\n/).filter( e => e.length > 0)
+
+// Делим выражение на слова по пробелам
 const splitToWords = (str) => str.split(/\s+/).filter( e => e.length > 0)
 
-let words  = splitToWords(programString)
+//Применение функции
+const apply = (operator, operands) => globalEnvironment[operator].apply(null, operands)
 
-let primitiveOperator = words[0]
-let primitiveOperands = words.slice(1)
+//Применение всего выражения
+const applyExpression = (expression) => {
+    let words = splitToWords(expression)
+    let primitiveOperator = words.slice(0,1)
+    let primitiveOperands = words.slice(1)
+        
+    console.log(globalEnvironment[primitiveOperator].apply(null, primitiveOperands))
+}
 
-console.log(globalEnvironment[primitiveOperator].apply(null, primitiveOperands))
-
-let testMultipleLines = `
-Hello this is dummy text
-that could be inside the
-text area. It will then
-get put into the canvas.`
-
-//console.log(testMultipleLines.match(/\n/g))
-//Переход на новую строку находится так
-//Каждая строка - новое выражение
-console.log(testMultipleLines.split(/\n/).filter( e => e.length > 0))
 //Теперь запустить цикл разбора по всем строкам
+let words  = splitLinesToExpressions(programString).forEach(expression => applyExpression(expression))
+
+
+
+
+
+
+
