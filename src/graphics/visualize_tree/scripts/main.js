@@ -1,10 +1,10 @@
 
 
-const treeDraw = (node, fn, childIndex) => {
+const treeTravel = (node, fn, childIndex) => {
     fn(node, childIndex)
     if (node.children.length !== 0){
         node.children.forEach((child, childIndex) => {
-            treeDraw(child, fn, childIndex)
+            treeTravel(child, fn, childIndex)
         })
     } else return    
 }
@@ -46,12 +46,18 @@ const ROOT_X = CANVAS_WIDTH / 2
 const ROOT_Y = CANVAS_HEIGHT / 4
 const RADIUS = 25
 
+const initLine = (ctx, startX, startY) => {
+	ctx.beginPath()
+	ctx.moveTo(startX, startY)	
+}
+
+
 const drawCircle = (ctx, x, y, radius, color) => {
 	ctx.beginPath()
 	ctx.fillStyle = color
 	ctx.arc(x, y, radius, 0, 2 * Math.PI)
 	//ctx.stroke()
-	ctx.fill();
+	ctx.fill()
 }
 
 const drawText = (ctx, x, y, fontSizeAndType, text, color) => {
@@ -60,6 +66,12 @@ const drawText = (ctx, x, y, fontSizeAndType, text, color) => {
 	ctx.font = fontSizeAndType
 	ctx.fillStyle = color
 	ctx.fillText(text, x, y)
+}
+
+const drawLine = (ctx, toX, toY) => {
+	
+	ctx.lineTo(toX, toY)
+	ctx.stroke()
 }
 
 const drawNode = (options) => {
@@ -76,9 +88,9 @@ const drawNode = (options) => {
 
 	} = options
 	
-
 	drawCircle(ctx, x, y, radius, shapeColor)
 	drawText(ctx, x, y, fontSizeAndType, text, textColor)
+	
 }
 
 
@@ -107,9 +119,11 @@ const tree = { value:-1,
 											]}
 					    ]}
 
-//treeDraw(tree, function(v, index) {console.log(index)})
+//treeTravel(tree, function(v, index) {console.log(index)})
 
-treeDraw(tree, function(node, childIndex) { 
+initLine(ctx, ROOT_X, ROOT_Y)
+
+treeTravel(tree, function(node, childIndex) { 
 	
 	const MULTIPLIER_X = 25
 	const MULTIPLIER_Y = 100
@@ -126,7 +140,7 @@ treeDraw(tree, function(node, childIndex) {
 	
 	//Сделать нормализацию значений, чтобы не вытягивалось дерево
 	//let shiftY = 
-
+	//drawLine(ctx, ROOT_X + shiftX , ROOT_Y + node.value * MULTIPLIER_Y)
 	drawNode({	ctx: ctx, 
 				x: ROOT_X + shiftX , 
 				y: ROOT_Y + node.value * MULTIPLIER_Y, 
@@ -134,7 +148,10 @@ treeDraw(tree, function(node, childIndex) {
 				shapeColor: "firebrick",
 				fontSizeAndType: "25px serif",
 				text: node["value"],
-				textColor: "white"})
+				textColor: "white"
+				
+			})
+	
 	console.log(node.value) 
 })
 
