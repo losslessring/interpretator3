@@ -1,21 +1,10 @@
 
 
-const treeTravel = (node, fn, depth, childIndex) => {
-	
-	//Глубина дерева - лежит в замыкании и не увеличивается при 
-	// переборе массива детей в ширину.
-	if(depth === undefined){
-		var depth = 0 
-	} else {
-		depth = depth += 1
-	}
-	//console.log(childIndex) 
-	fn(node, depth, childIndex)
-	//let parentDataFromOutside = fn(node, depth, childIndex)
-	//console.log(parentDataFromOutside)
+const treeTravel = (node, fn, childIndex) => {
+    fn(node, childIndex)
     if (node.children.length !== 0){
         node.children.forEach((child, childIndex) => {
-            treeTravel(child, fn, depth, childIndex)
+            treeTravel(child, fn, childIndex)
         })
     } else return    
 }
@@ -80,8 +69,7 @@ const drawText = (ctx, x, y, fontSizeAndType, text, color) => {
 }
 
 const drawLine = (ctx, toX, toY) => {
-	//ctx.beginPath()
-	//ctx.moveTo(fromX, fromY)	
+	
 	ctx.lineTo(toX, toY)
 	ctx.stroke()
 }
@@ -102,7 +90,7 @@ const drawNode = (options) => {
 	
 	drawCircle(ctx, x, y, radius, shapeColor)
 	drawText(ctx, x, y, fontSizeAndType, text, textColor)
-	return {parentX: x, parentY: y}
+	
 }
 
 
@@ -135,28 +123,27 @@ const tree = { value:-1,
 
 initLine(ctx, ROOT_X, ROOT_Y)
 
-treeTravel(tree, function(node, depth, childIndex) { 
+treeTravel(tree, function(node, childIndex) { 
 	
-	const MULTIPLIER_X = 100
+	const MULTIPLIER_X = 25
 	const MULTIPLIER_Y = 100
-	//const SHIFT_LEFT = -50
+	const SHIFT_LEFT = -50
 	
 
 	if(childIndex === undefined){
 		var shiftX = 0
-	} //else if(childIndex === 0){
-		//var shiftX = SHIFT_LEFT
-	//} 
-	else {
-		var shiftX = (childIndex + 1) * MULTIPLIER_X
+	} else if(childIndex === 0){
+		var shiftX = SHIFT_LEFT
+	} else {
+		var shiftX = childIndex * MULTIPLIER_X
 	}
 	
 	//Сделать нормализацию значений, чтобы не вытягивалось дерево
 	//let shiftY = 
-	drawLine(ctx, ROOT_X + shiftX , ROOT_Y + depth * MULTIPLIER_Y)
-	let parentCoords = drawNode({ctx: ctx, 
+	//drawLine(ctx, ROOT_X + shiftX , ROOT_Y + node.value * MULTIPLIER_Y)
+	drawNode({	ctx: ctx, 
 				x: ROOT_X + shiftX , 
-				y: ROOT_Y + depth * MULTIPLIER_Y, 
+				y: ROOT_Y + node.value * MULTIPLIER_Y, 
 				radius: RADIUS, 
 				shapeColor: "firebrick",
 				fontSizeAndType: "25px serif",
@@ -164,9 +151,7 @@ treeTravel(tree, function(node, depth, childIndex) {
 				textColor: "white"
 				
 			})
-
-	//console.log(parentCoords)
-	//console.log(node.value)
-	return parentCoords 
+	
+	console.log(node.value) 
 })
 
