@@ -116,6 +116,14 @@ const childrenShiftCalc = (childIndex, arrayLength) => {
 		return childIndex
 }
 
+const normalize = (val, min, max, a, b) => {
+	if (min === max){
+		return 0
+	}
+	return ((b - a)*((val - min) / (max - min))) + a
+}
+
+
 
 const tree = { value:-1, 
 			   children:[
@@ -126,6 +134,8 @@ const tree = { value:-1,
 												 ]},
 												{value: 2, children:[]},
 												{value: 2, children:[]},
+												{value: 2, children:[]},
+												{value: 2, children:[]},
 											]}
 					    ]}
 
@@ -133,7 +143,7 @@ const tree = { value:-1,
 
 const drawNodeWithEdges = function(node, depth, childIndex, arrayOfChildren, parentNodeData) { 
 	
-	const MULTIPLIER_X = 50
+	const MULTIPLIER_X = 25
 	const MULTIPLIER_Y = 100
 	//const SHIFT_LEFT = -50
 
@@ -155,8 +165,10 @@ const drawNodeWithEdges = function(node, depth, childIndex, arrayOfChildren, par
 		childIndex = 0
 	}
 	
-	let shiftX = (childrenShiftCalc(childIndex, arrayOfChildren.length - 1)) * MULTIPLIER_X 
-	
+	//let shiftX = (childrenShiftCalc(childIndex, arrayOfChildren.length - 1)) * MULTIPLIER_X
+	let shiftX = (normalize(childIndex, 0, arrayOfChildren.length - 1, -arrayOfChildren.length, arrayOfChildren.length)) * MULTIPLIER_X
+	//console.log(arrayOfChildren.length - 1)
+	console.log(shiftX)
 	drawLine(ctx, parentNodeData.x , parentNodeData.y, parentNodeData.x + shiftX , ROOT_Y + depth * MULTIPLIER_Y, "firebrick")
 	let parentCoords = drawNode({ctx: ctx, 
 				x: parentNodeData.x + shiftX, 
