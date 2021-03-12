@@ -1,6 +1,6 @@
 
 
-const treeTravel = (node, parentNode, fn, depth, childIndex, parentNodeDataFromOutside) => {
+const treeTravel = (node, fn, depth, childIndex, arrayOfChildren, parentNodeDataFromOutside) => {
 	
 	//Глубина дерева - лежит в замыкании и не увеличивается при 
 	// переборе массива детей в ширину.
@@ -10,13 +10,13 @@ const treeTravel = (node, parentNode, fn, depth, childIndex, parentNodeDataFromO
 		depth = depth += 1
 	}
 	//console.log(childIndex) 
-	parentNodeDataFromOutside = fn(node, parentNode, depth, childIndex, parentNodeDataFromOutside)
+	parentNodeDataFromOutside = fn(node, depth, childIndex, arrayOfChildren, parentNodeDataFromOutside)
 	//console.log(parentNodeDataFromOutside)
 	//let parentDataFromOutside = fn(node, depth, childIndex)
 	//console.log(parentDataFromOutside)
     if (node.children.length !== 0){
-        node.children.forEach((child, childIndex) => {
-            treeTravel(child, node, fn, depth, childIndex, parentNodeDataFromOutside)
+        node.children.forEach((child, childIndex, arrayOfChildren) => {
+            treeTravel(child, fn, depth, childIndex, arrayOfChildren, parentNodeDataFromOutside)
         })
     } else return    
 }
@@ -107,14 +107,23 @@ const drawNode = (options) => {
 	return {x: x, y: y}
 }
 
-
+const childrenShiftCalc = (childIndex, arrayLength) => {
+	if (childIndex < arrayLength /2)
+		return childIndex - arrayLength
+	if (childIndex === arrayLength /2)
+		return 0
+	if (childIndex > arrayLength /2)
+		return childIndex
+}
 
 
 const tree = { value:-1, 
 			   children:[
 						 {value: 0, children:[]},
 						 {value: 0, children:[
-							 					{value: 2, children:[]},
+							 					{value: 2, children:[
+													{value: 4, children:[]},	 
+												 ]},
 												{value: 2, children:[]},
 												{value: 2, children:[]},
 											]}
@@ -122,9 +131,9 @@ const tree = { value:-1,
 
 
 
-const drawNodeWithEdges = function(node, parentNode, depth, childIndex, parentNodeData) { 
+const drawNodeWithEdges = function(node, depth, childIndex, arrayOfChildren, parentNodeData) { 
 	
-	const MULTIPLIER_X = 100
+	const MULTIPLIER_X = 50
 	const MULTIPLIER_Y = 100
 	//const SHIFT_LEFT = -50
 
@@ -136,23 +145,21 @@ const drawNodeWithEdges = function(node, parentNode, depth, childIndex, parentNo
 		}
 		
 	}
-	
-	console.log(childIndex)
-	if(childIndex === undefined){
-		var shiftX = 0
-	} //else if(childIndex === 0){
-		//var shiftX = SHIFT_LEFT
-	//} 
-	else {
-		var shiftX = (childIndex ) * MULTIPLIER_X 
+
+	//console.log(arrayOfChildren)
+	if (arrayOfChildren === undefined){
+		arrayOfChildren = []
+	}
+
+	if (childIndex === undefined){
+		childIndex = 0
 	}
 	
+	let shiftX = (childrenShiftCalc(childIndex, arrayOfChildren.length - 1)) * MULTIPLIER_X 
 	
-	//Сделать нормализацию значений, чтобы не вытягивалось дерево
-	//let shiftY = 
 	drawLine(ctx, parentNodeData.x , parentNodeData.y, parentNodeData.x + shiftX , ROOT_Y + depth * MULTIPLIER_Y, "firebrick")
 	let parentCoords = drawNode({ctx: ctx, 
-				x: parentNodeData.x + shiftX , 
+				x: parentNodeData.x + shiftX, 
 				y: ROOT_Y + depth * MULTIPLIER_Y, 
 				radius: RADIUS, 
 				shapeColor: "firebrick",
@@ -170,6 +177,6 @@ const drawNodeWithEdges = function(node, parentNode, depth, childIndex, parentNo
 
 initLine(ctx, ROOT_X, ROOT_Y)
 
-treeTravel(tree, {value: -2}, drawNodeWithEdges)
+treeTravel(tree, drawNodeWithEdges)
 
 // ЗАДАЧИ parentNode не нужен, переписать в функциональном стиле
